@@ -90,18 +90,6 @@
     line-height: 34px;
     color: var(--ink);
     white-space: pre-wrap;
-    outline: none;
-  }
-
-  .page-content:empty::before{
-    content: attr(data-placeholder);
-    color: var(--ink-soft);
-    opacity: 0.55;
-    font-style: italic;
-  }
-
-  .page-content:focus{
-    background: rgba(122, 46, 46, 0.03);
   }
 
   .signature-line{
@@ -181,10 +169,7 @@
   <div class="sheet-wrap">
     <div class="sheet">
       <div class="page-number" id="pageNumber">1 / 7</div>
-      <div class="page-content"
-           id="pageContent"
-           contenteditable="true"
-           data-placeholder="Write page one here..."></div>
+      <div class="page-content" id="pageContent"></div>
     </div>
   </div>
 
@@ -194,16 +179,44 @@
     <button class="nav-btn" id="nextBtn" aria-label="Next page">&#8594;</button>
   </div>
 
-  <div class="hint">click the page to write &middot; use the arrows or &larr; &rarr; keys to turn pages</div>
+  <div class="hint">use the arrows or &larr; &rarr; keys to turn pages</div>
 </div>
 
 <script>
-  const TOTAL_PAGES = 7;
-  const STORAGE_KEY = 'letter-pages';
+  // ---------------------------------------------------------------
+  // EDIT YOUR LETTER HERE. One string per page, in order.
+  // Use \n for line breaks within a page.
+  // ---------------------------------------------------------------
+  const pages = [
+`dear, Dani
 
-  let pages = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null')
-    || Array(TOTAL_PAGES).fill('');
+alam mo, i had so much fun with you, i felt like i found myself a really good friend na makakamatch ko sa energy at humor ko. wala akong ideya noong una kung sino ka, naging interesado ako lalo sayo kasi madali mo akong naiintindihan, hindi lang sa mga jokes ko o sa mga punch lines ko sayo pero parang naramdaman ko na malaki yung pagkakaiba ng dating mo sa akin kasi sa ganung paraan ako sayo nagpakilala kaysa sa iba kong mga naging kaibigan o nakausap. nakilala mo ako sa pakikipagdaldalin at medyo pakikipaglandian natin noon, mula doon, naramdaman ko na nagustuhan na kita, naramdaman ko na baka mas maganda kung hindi lang pagiging magkaibigan yung relasyon na gusto natin para sa isa't isa. 
 
+binabalikan ko ngayon yung mga convo natin 6 years ago: sobrang corny at baduy ko, buti na lang talaga napagtiyagaan mo ako.
+
+we started with the most basic and cliche lines, how i got to know you better is dahil sa mga used na lines ko pero there's more than that, nakilala kita nang hindi ko namamalayan na hindi ko na kailangang ibahin yung sarili ko. i mean, i just have to become what i usually and originally am kasi thats how you knew me then. that was speical to me, the mere fact na hindi ko kailangang haluan ng pagpapanggap para lang magustuhan mo ako bilang kaibigan o kausap mo nung oras na yun. don't get me wrong, i didnt talk to you then kasi i was bored, i talked to you kasi nakuha mo yung atensyon ko, i knew that there's more than just my usual way of flirting with some girls na kasi gusto kong ipilit.
+
+we used to play srabbles, share memes, talk about tons of films, talk about music, talk about memes, talk about music in films, mahal na rin pala natin yung isa't isa non sa sobra nating magbatuhan nung "i love you" hahaha. those are the times na i like remembering about sa atin non, we were young and bored i guess since pandemic din, naglalaro tayo ng ml, nagrreplyan tayo within seconds, pinagpupuyatan natin isa't isa dahil napapahaba daldalan natin.
+
+bago ako magbirthday noon, nakita ko dito sa mga convo na doon ako nagsimulang maging kupal sayo, inuna ko na yung sarili ko at hindi ko na intindi yung mararamdan mo o yung nararamdaman mo sa akin non. doon ako nagdesisyon non na gusto ko nang magjowa, iyun talaga yung pakay ko noon sayo, gusto kitang kilalanin, kaibiganin, hanggang sa makilala ko yung mga tao sa buhay mo tsaka magpaalam sayo kung pwede ba akong manligaw sayo, hindi ko man lang nagawang sabihin sayo nun, mahirap din sitwasyon natin non- pandemic, 
+
+you wanted to be friends, i thought u were trying to make it clear nang hindi dinederekta, i wanted us to be more than that, i was impatient and stupid.`,
+
+`Page two text goes here.`,
+
+`Page three text goes here.`,
+
+`Page four text goes here.`,
+
+`Page five text goes here.`,
+
+`Page six text goes here.`,
+
+`Page seven text goes here.`
+  ];
+  // ---------------------------------------------------------------
+
+  const TOTAL_PAGES = pages.length;
   let current = 0;
 
   const contentEl = document.getElementById('pageContent');
@@ -222,36 +235,15 @@
     }
   }
 
-  function save(){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(pages));
-  }
-
   function render(){
     contentEl.textContent = pages[current];
-    contentEl.setAttribute('data-placeholder', `Write page ${current + 1} here...`);
     pageNumberEl.textContent = `${current + 1} / ${TOTAL_PAGES}`;
     prevBtn.disabled = current === 0;
     nextBtn.disabled = current === TOTAL_PAGES - 1;
     buildDots();
-    contentEl.focus();
-    placeCaretAtEnd(contentEl);
-  }
-
-  function placeCaretAtEnd(el){
-    el.focus();
-    if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
-      const range = document.createRange();
-      range.selectNodeContents(el);
-      range.collapse(false);
-      const sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
   }
 
   function goTo(index){
-    pages[current] = contentEl.textContent;
-    save();
     current = index;
     render();
   }
@@ -259,15 +251,7 @@
   prevBtn.addEventListener('click', () => { if(current > 0) goTo(current - 1); });
   nextBtn.addEventListener('click', () => { if(current < TOTAL_PAGES - 1) goTo(current + 1); });
 
-  contentEl.addEventListener('input', () => {
-    pages[current] = contentEl.textContent;
-    save();
-  });
-
   document.addEventListener('keydown', (e) => {
-    if(document.activeElement === contentEl){
-      return;
-    }
     if(e.key === 'ArrowLeft' && current > 0) goTo(current - 1);
     if(e.key === 'ArrowRight' && current < TOTAL_PAGES - 1) goTo(current + 1);
   });
