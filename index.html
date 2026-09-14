@@ -168,9 +168,11 @@
   .playlist-page{
     display: none;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
     flex: 1;
     min-height: 0;
-    gap: 18px;
+    gap: 20px;
   }
 
   .playlist-page.active{
@@ -185,11 +187,12 @@
   }
 
   .playlist-frame-wrap{
-    flex: 1;
-    min-height: 0;
+    width: 100%;
+    height: min(392px, 52dvh);
+    flex-shrink: 0;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 6px 18px -8px rgba(30, 25, 15, 0.35);
+    box-shadow: 0 12px 30px -10px rgba(30, 25, 15, 0.4);
   }
 
   .playlist-frame-wrap iframe{
